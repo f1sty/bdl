@@ -1,5 +1,5 @@
 const std = @import("std");
-const Scanner = @import("Scanner");
+const Scanner = @import("Scanner.zig");
 
 pub fn main(init: std.process.Init) !void {
     const args = try init.minimal.args.toSlice(init.gpa);
