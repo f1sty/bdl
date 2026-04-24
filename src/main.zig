@@ -44,11 +44,14 @@ fn runPrompt(allocator: std.mem.Allocator, io: std.Io) !void {
 
 fn run(allocator: std.mem.Allocator, io: std.Io, source: []const u8) !void {
     var scanner = try Scanner.init(allocator, source);
+    defer scanner.deinit();
+
     var writer = std.Io.File.stdout().writer(io, &.{});
 
     const tokens = try scanner.scanTokens();
+
     for (tokens.items) |token| {
-        try writer.interface.print("{any}\n", .{token});
+        try writer.interface.print("{f}\n", .{token});
         try writer.flush();
     }
 }
