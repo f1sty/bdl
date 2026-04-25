@@ -11,6 +11,7 @@
 - ! (define constant)
 - ? (defive variable)
 - : (return)
+- ; (end of expression)
 - -> (include/arrow)
 - $ (reference)
 - % (dereference)
