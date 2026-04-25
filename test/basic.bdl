@@ -1,26 +1,26 @@
-std = -> std
--> math
+alias = -> std;
+-> math;
 
 # sum(x, y) |
-  : x + y
+  x + y:
 |
 
 # double_sum(x, y) |
-  ? sum = x + y
-  sum += sum(x, y)
-  : sum
+  ? sum = x + y;
+  sum += sum(x, y);
+  sum:
 |
 
 # main() |
-  ! magic = 3.14
-  ? even_more_magic = magic / 2
-  even_more_magic += double_sum(19, 87)
+  ! magic = 3.14;
+  ? even_more_magic = magic / 2;
+  even_more_magic += double_sum(19, 87);
 
   if (even_more_magic >= 150) |
-    print("pryvit\n")
+    print("pryvit\n");
   | else |
-    print("buvaj!\n")
+    print("buvaj!\n");
   |
 
-  print ("the answer is: {f}\n", magic + even_more_magic)
+  print ("the answer is: {f}\n", magic + even_more_magic);
 |

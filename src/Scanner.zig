@@ -18,6 +18,7 @@ const Token = union(enum) {
     bang: []const u8,
     qmark: []const u8,
     colon: []const u8,
+    semicolon: []const u8,
     arrow: []const u8,
     dollar: []const u8,
     percent: []const u8,
@@ -109,6 +110,7 @@ fn scanByte(self: *Scanner, byte: u8) !void {
         '!' => try self.addToken(.{ .bang = self.src[self.r.seek - 1 .. self.r.seek] }),
         '?' => try self.addToken(.{ .qmark = self.src[self.r.seek - 1 .. self.r.seek] }),
         ':' => try self.addToken(.{ .colon = self.src[self.r.seek - 1 .. self.r.seek] }),
+        ';' => try self.addToken(.{ .semicolon = self.src[self.r.seek - 1 .. self.r.seek] }),
         '$' => try self.addToken(.{ .dollar = self.src[self.r.seek - 1 .. self.r.seek] }),
         '%' => try self.addToken(.{ .percent = self.src[self.r.seek - 1 .. self.r.seek] }),
         ',' => try self.addToken(.{ .comma = self.src[self.r.seek - 1 .. self.r.seek] }),
@@ -207,7 +209,13 @@ fn scanNumber(self: *Scanner) !void {
     var float: bool = false;
 
     while (true) {
-        const byte = try self.r.peekByte();
+        const byte = self.r.peekByte() catch |err| switch (err) {
+            error.EndOfStream => {
+                try self.classifyAndAppend(self.src[start..self.r.seek]);
+                break;
+            },
+            else => |e| return e,
+        };
         if (byte == '.') {
             float = true;
         } else if (!std.ascii.isDigit(byte)) {
@@ -232,7 +240,13 @@ fn scanLiteralOrKeyword(self: *Scanner) !void {
     const start = self.r.seek - 1;
 
     while (true) {
-        const byte = try self.r.peekByte();
+        const byte = self.r.peekByte() catch |err| switch (err) {
+            error.EndOfStream => {
+                try self.classifyAndAppend(self.src[start..self.r.seek]);
+                break;
+            },
+            else => |e| return e,
+        };
         if (!std.ascii.isAlphanumeric(byte) and byte != '_') {
             try self.classifyAndAppend(self.src[start..self.r.seek]);
             break;
