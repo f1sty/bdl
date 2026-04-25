@@ -3,8 +3,8 @@ const std = @import("std");
 
 r: std.Io.Reader,
 src: []const u8,
-line_number: u32 = 1,
-line_position: u32 = 1,
+line: u32 = 1,
+column: u32 = 1,
 allocator: std.mem.Allocator,
 tokens: std.ArrayList(Token) = .empty,
 
@@ -91,7 +91,7 @@ pub fn scanTokens(self: *Scanner) !std.ArrayList(Token) {
 }
 
 fn reportError(self: *Scanner, caller: []const u8, err: anyerror) void {
-    std.log.err("[{d}:{d}] Error in {s}: {s}\n", .{ self.line_number, self.line_position + 1, caller, @errorName(err) });
+    std.log.err("[{d}:{d}] Error in {s}: {s}\n", .{ self.line, self.column + 1, caller, @errorName(err) });
 }
 
 fn addToken(self: *Scanner, token: Token) !void {
@@ -102,8 +102,8 @@ fn scanByte(self: *Scanner, byte: u8) !void {
     sw: switch (byte) {
         ' ', '\t', '\r' => {},
         '\n' => {
-            self.line_number += 1;
-            self.line_position = 1;
+            self.line += 1;
+            self.column = 1;
         },
         '#' => try self.addToken(.{ .hash = self.src[self.r.seek - 1 .. self.r.seek] }),
         '@' => try self.addToken(.{ .at = self.src[self.r.seek - 1 .. self.r.seek] }),
@@ -200,7 +200,7 @@ fn scanByte(self: *Scanner, byte: u8) !void {
             return error.UnknownToken;
         },
     }
-    self.line_position += 1;
+    self.column += 1;
 }
 
 // TODO: make number scanning more sophisticated (e.g. handle 01 number)
